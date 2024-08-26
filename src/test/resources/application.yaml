@@ -1,0 +1,5 @@
+quarkus:
+  log:
+    category:
+      "com.roundfeather.persistence.utils.datastore.serde.impl":
+        level: DEBUG
