@@ -85,6 +85,10 @@ public class MyObject {
     // derived from the parent object
     @DatastoreExternalEntity(ancestorFactory = MyAncestorFactory.class)
     private List<MyExternalObject> externalObjects;
+    
+    // Datastore properties can be nested in a child object instead as well
+    @DatastoreNested
+    private SomeNestedObject nestedObject;
 
     // Fields not annotated will still get written/read from datastore
     private Double someField1;
@@ -150,3 +154,51 @@ MyObject deletedObject = repository.delete(
 ### 4. Advanced Usage
 
 ## Mocking Repository
+
+### 1. Injecting the Repository
+
+A mock for a `DatastoreRepository` can be injected like any other object.
+
+```java
+@InjectMock
+DatastoreRepository<MyObject> repository;
+```
+
+### 2. Mocking Calls
+
+Mockito can easily mock method calls for the repository. The objects `DatastoreNamespace`, `Key` and `Ancestor` all have
+custom `equal()` methods based on their field values which let you use Mockito's `eq()` matcher even when they are created
+in the method under test.
+
+> ⚠️ **_NOTE:_**
+> `DatastoreRepository` has methods that take lists or varargs as arguments. Keep in mind to mock the specific signature
+> that you are using in your code
+
+```java
+// List argument example
+when(repository.list(any(), (List<Ancestor>) any()))
+        .thenReturn(List.of(myObject1, myObject2));
+
+// Varargs argument examples
+when(repository.find(any(), eq(Key.of(1L)), (Ancestor[]) any()))
+        .thenReturn(myObject3);
+
+when(repository.find(any(), eq(Key.of(1L)), eq(Ancestor.of("ancestor1Kind", 1L))))
+        .thenReturn(myObject4);
+```
+
+## Comparison Utilities
+
+### 1. *isSame()*
+
+A helper function is included that will compare The two objects and determine if they are the same or not.
+
+> ⚠️ **_NOTE:_**
+> Currently `isSame()` does not compare the values in a `Map`
+
+### 2. *mergeNonNullFields()*
+
+A helper function is included will merge all the non-null fields from a source object into a target object.
+
+> ⚠️ **_NOTE:_**
+> Currently `mergeNonNullFields()` does not merge the values in a `Map`

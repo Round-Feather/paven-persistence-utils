@@ -63,6 +63,10 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-config-yaml</artifactId>
+        </dependency>
 
         <!-- test -->
         <dependency>
@@ -196,7 +200,7 @@
                 <version>${jacoco.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>com/roundfeather/paven/core/calculations/model/**</exclude>
+                        <exclude>com/roundfeather/persistence/utils/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

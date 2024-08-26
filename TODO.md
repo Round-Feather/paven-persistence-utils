@@ -1,7 +1,14 @@
 # To Dos
 
 ## 🚀 Features
-- [ ] Support single child entity for external entities, not just lists
-- [ ] Support user overrides for serde implementation through new annotation 
+- [ ] Single child entity for external entities, not just lists
+- [ ] User overrides for serde implementation through new annotation
+- [ ] Conditional serde through annotation
+- [ ] Get key based on keyless object
+- [ ] Automatic caching of results and cache configuration
+  - [Cache Interface Github](https://github.com/quarkusio/quarkus/blob/main/extensions/cache/runtime-spi/src/main/java/io/quarkus/cache/Cache.java#L12)
+  - [CacheManager documentation](https://quarkus.io/guides/cache#retrieving-a-cache-from-the-cachemanager)
+  - [Redis Cache configuration documentation](https://quarkus.io/guides/cache-redis-reference#redis-cache-configuration-reference)
+  - [Quarkus ConfigSource documentation](https://quarkus.io/guides/config-extending-support#custom-config-source)
 
 ## 🐞 Bug Fixes
