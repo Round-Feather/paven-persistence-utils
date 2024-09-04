@@ -3,8 +3,7 @@ package com.roundfeather.persistence.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Utility class for interacting with objects
@@ -65,7 +64,7 @@ public class ObjectUtils {
             }
         } else {
             String setMethodName = "set" + f.getName().substring(0, 1).toUpperCase() + f.getName().substring(1);
-            Optional<Method> setMethod = Arrays.stream(o.getClass().getDeclaredMethods())
+            Optional<Method> setMethod = getAllMethods(o).stream()
                     .filter(m -> m.getName().equals(setMethodName))
                     .findFirst();
 
@@ -77,5 +76,45 @@ public class ObjectUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Gets all the fields of an object
+     *
+     * @param o object to get all fields for
+     * @return list of all fields for the object
+     *
+     * @since 1.1
+     */
+    public static List<Field> getAllFields(Object o) {
+        Set<Field> fields = new HashSet<>();
+        Class c = o.getClass();
+
+        while (c.getSuperclass() != null) {
+            fields.addAll(Arrays.stream(c.getDeclaredFields()).toList());
+            c = c.getSuperclass();
+        }
+
+        return fields.stream().toList();
+    }
+
+    /**
+     * Gets all the methods of an object
+     *
+     * @param o object to get all fields for
+     * @return list of all methods for the object
+     *
+     * @since 1.1
+     */
+    public static List<Method> getAllMethods(Object o) {
+        Set<Method> methods = new HashSet<>();
+        Class c = o.getClass();
+
+        while (c.getSuperclass() != null) {
+            methods.addAll(Arrays.stream(c.getDeclaredMethods()).toList());
+            c = c.getSuperclass();
+        }
+
+        return methods.stream().toList();
     }
 }
