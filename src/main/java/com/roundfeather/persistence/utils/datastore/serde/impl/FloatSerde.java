@@ -41,23 +41,23 @@ public class FloatSerde implements DataStoreObjectSerde<Float> {
 
     @Override
     public boolean canDeserialize(Type t, Value v) {
-        return (t == Float.class || t == float.class) && v.getType() == ValueType.DOUBLE;
+        return (t == Float.class || t == float.class) && (v.getType() == ValueType.DOUBLE || v.getType() == ValueType.LONG);
     }
 
     @Override
     public boolean canDeserialize(Class t, Value v) {
-        return (t == Float.class || t == float.class) && v.getType() == ValueType.DOUBLE;
+        return (t == Float.class || t == float.class) && (v.getType() == ValueType.DOUBLE || v.getType() == ValueType.LONG);
     }
 
     @Override
     public Float deserialize(DatastoreNamespace dsNamespace, EntityManager em, Value v, Type tp) {
         log.debug(String.format("Deserializing value type '%s' as a 'float'", v.getType().name()));
-        return ((Double) v.get()).floatValue();
+        return ((Number) v.get()).floatValue();
     }
 
     @Override
     public Float deserialize(DatastoreNamespace dsNamespace, EntityManager em, Value v, Class tp) {
         log.debug(String.format("Deserializing value type '%s' as a 'float'", v.getType().name()));
-        return ((Double) v.get()).floatValue();
+        return ((Number) v.get()).floatValue();
     }
 }

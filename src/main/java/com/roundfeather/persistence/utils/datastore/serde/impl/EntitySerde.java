@@ -1,9 +1,6 @@
 package com.roundfeather.persistence.utils.datastore.serde.impl;
 
-import com.google.cloud.datastore.EntityValue;
-import com.google.cloud.datastore.FullEntity;
-import com.google.cloud.datastore.IncompleteKey;
-import com.google.cloud.datastore.Value;
+import com.google.cloud.datastore.*;
 import com.roundfeather.persistence.utils.datastore.DatastoreNamespace;
 import com.roundfeather.persistence.utils.datastore.EntityManager;
 import com.roundfeather.persistence.utils.datastore.annotation.*;
@@ -11,16 +8,15 @@ import com.roundfeather.persistence.utils.datastore.serde.DataStoreObjectSerde;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.google.cloud.datastore.FullEntity.newBuilder;
-import static com.roundfeather.persistence.utils.ObjectUtils.setFieldValue;
+import static com.roundfeather.persistence.utils.ObjectUtils.*;
 
 /**
  * @see DataStoreObjectSerde
@@ -74,7 +70,7 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
 
         FullEntity.Builder builder = bootstrapBuilder(key);
 
-        Arrays.stream(o.getClass().getDeclaredFields())
+        getAllFields(o).stream()
                 .filter(f ->
                         f.getAnnotation(DatastoreKey.class) == null &&
                                 f.getAnnotation(DatastoreAncestor.class) == null &&
@@ -146,7 +142,7 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
             Method buildMethod = Arrays.stream(builder.getClass().getDeclaredMethods())
                     .filter(m -> m.getName().equals("build"))
                     .findFirst().get();
-
+            buildMethod.setAccessible(true);
             return buildMethod.invoke(builder);
         } else {
             return tp.getConstructor().newInstance();
@@ -164,11 +160,13 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
             o = initializeObject((Class) tp);
             em.setKeyFields(o, e);
 
-            Arrays.stream(o.getClass().getDeclaredFields())
+            getAllFields(o).stream()
                     .filter(
                             f -> f.getAnnotation(DatastoreSkip.class) == null &&
                                     f.getAnnotation(DatastoreAncestor.class) == null &&
-                                    f.getAnnotation(DatastoreKey.class) == null
+                                    f.getAnnotation(DatastoreKey.class) == null &&
+                                    f.getAnnotation(DatastoreExternalEntity.class) == null &&
+                                    f.getAnnotation(DatastoreSubTypes.class) == null
                     )
                     .forEach(f -> {
                                 if (f.getAnnotation(DatastoreNested.class) != null) {
@@ -197,9 +195,11 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
                             }
                     );
 
-            Arrays.stream(((Class) tp).getDeclaredFields())
+            getAllFields(o).stream()
                     .filter(f -> f.getAnnotation(DatastoreExternalEntity.class) != null)
                     .forEach(f -> setFieldValue(o, f, em.getExternalEntity(dsNamespace, o, f)));
+
+            handleSubtypes(dsNamespace, em, e, o);
 
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
@@ -219,11 +219,13 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
             o = initializeObject(tp);
             em.setKeyFields(o, e);
 
-            Arrays.stream(o.getClass().getDeclaredFields())
+            getAllFields(o).stream()
                     .filter(
                             f -> f.getAnnotation(DatastoreSkip.class) == null &&
                                     f.getAnnotation(DatastoreAncestor.class) == null &&
-                                    f.getAnnotation(DatastoreKey.class) == null
+                                    f.getAnnotation(DatastoreKey.class) == null &&
+                                    f.getAnnotation(DatastoreExternalEntity.class) == null &&
+                                    f.getAnnotation(DatastoreSubTypes.class) == null
                     )
                     .forEach(f -> {
                                 if (f.getAnnotation(DatastoreNested.class) != null) {
@@ -252,14 +254,68 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
                             }
                     );
 
-            Arrays.stream(tp.getDeclaredFields())
+            getAllFields(o).stream()
                     .filter(f -> f.getAnnotation(DatastoreExternalEntity.class) != null)
                     .forEach(f -> setFieldValue(o, f, em.getExternalEntity(dsNamespace, o, f)));
+
+            handleSubtypes(dsNamespace, em, e, o);
 
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
 
         return o;
+    }
+
+    /**
+     * Handles the deserialization of a {@link FullEntity} into a subtype-able field
+     *
+     * @param dsNamespace Namespace of parent Entity
+     * @param em EntityManager for handling complex objects
+     * @param e Entity to deserialize
+     * @param o Object to inject conditional subtype into
+     *
+     * @since 1.1
+     */
+    private static void handleSubtypes(DatastoreNamespace dsNamespace, EntityManager em, FullEntity e, Object o) {
+        getAllFields(o).stream()
+                .filter(f -> f.getAnnotation(DatastoreSubType.class) != null || f.getAnnotation(DatastoreSubTypes.class) != null)
+                .forEach(f -> {
+                    String pName = (String) (e.getProperties().keySet().stream())
+                            .filter(p -> {
+                                String propertyName;
+                                if (f.getAnnotation(DatastorePropertyAs.class) != null) {
+                                    propertyName = f.getAnnotation(DatastorePropertyAs.class).value();
+                                } else {
+                                    propertyName = f.getName();
+                                }
+                                return propertyName.equals(p);
+                            })
+                            .findFirst()
+                            .orElse("");
+
+                    if (!pName.isEmpty()) {
+                        String subTypeName;
+                        Value val = (Value) e.getProperties().get(pName);
+
+                        if (f.getAnnotation(DatastoreTypeInfo.class).include() == InclusionType.EXTERNAL_PROPERTY) {
+                            Field subTpField = getAllFields(o).stream()
+                                    .filter(f2 -> f2.getName().equals(f.getAnnotation(DatastoreTypeInfo.class).property()))
+                                    .findFirst()
+                                    .get();
+
+                            subTypeName = getFieldValue(o, subTpField).toString();
+                        } else {
+                            subTypeName = ((Value) e.getEntity(pName).getProperties().get(f.getAnnotation(DatastoreTypeInfo.class).property())).get().toString();
+                        }
+                        Class subTp = Arrays.stream(f.getAnnotation(DatastoreSubTypes.class).value())
+                                .filter(st -> st.name().equals(subTypeName) || Arrays.stream(st.names()).toList().contains(subTypeName))
+                                .map(st -> st.type())
+                                .findFirst()
+                                .get();
+
+                        setFieldValue(o, f, em.handleProperty(dsNamespace, subTp, val));
+                    }
+                });
     }
 }
