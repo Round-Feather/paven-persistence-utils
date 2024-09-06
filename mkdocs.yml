@@ -1,0 +1,23 @@
+site_name: Paven Persistence Utils
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - techdocs-core:
+      use_material_search: true
+  - search
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

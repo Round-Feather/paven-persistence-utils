@@ -1,0 +1,17 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: paven-persistence-utils
+  annotations:
+#    backstage.io/source-location: url:https://github.com/Round-Feather/paven-core-vehicles-service
+    backstage.io/techdocs-ref: dir:.
+    google.com/cloudbuild-project-slug: paven-common-v3
+    google.com/cloudbuild-location: global
+  links:
+    - url: https://roundfeather-paven.atlassian.net/wiki/x/AYCsNQ
+      title: Confluence
+spec:
+  type: library
+  lifecycle: production
+  owner: guests
