@@ -1,7 +1,3 @@
----
-status: new
----
-
 # DatastoreEntity
 
 The `@DatastoreEntity` annotation is a key component in the custom Object-Relational Mapping (ORM) framework designed for Google Datastore. This annotation marks a class as a Datastore entity and provides additional configurations for automatic repository generation.
