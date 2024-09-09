@@ -8,6 +8,7 @@ metadata:
     backstage.io/techdocs-ref: dir:.
     google.com/cloudbuild-project-slug: paven-common-v3
     google.com/cloudbuild-location: global
+    sonarqube.org/project-key: Round-Feather_paven-persistence-utils_AZFQ_wKnmpqdTNJ_C8m9
   links:
     - url: https://roundfeather-paven.atlassian.net/wiki/x/AYCsNQ
       title: Confluence
