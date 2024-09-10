@@ -30,4 +30,4 @@ spec:
   lifecycle: production
   owner: guests
   definition:
-    $text: https://storage.googleapis.com/paven-common-public-assets/openapi/persistence-utils/openapi.yaml
+    $text: https://storage.googleapis.com/paven-common-public-assets/openapi/paven-persistence-utils/openapi.yaml
