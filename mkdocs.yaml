@@ -1,4 +1,4 @@
-site_name: SERVICE_NAME
+site_name: PersistenceUtils
 
 theme:
   name: material

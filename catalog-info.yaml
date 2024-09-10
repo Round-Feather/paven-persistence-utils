@@ -2,7 +2,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: SERVICE_NAME-service
+  name: persistence-utils-service
   annotations:
     backstage.io/techdocs-ref: dir:.
     google.com/cloudbuild-project-slug: paven-common-v3
@@ -18,16 +18,16 @@ spec:
   lifecycle: production
   owner: guests
   providesApis:
-    - SERVICE_NAME-api
+    - persistence-utils-api
 
 ---
 apiVersion: backstage.io/v1alpha1
 metadata:
-  name: SERVICE_NAME-api
+  name: persistence-utils-api
 kind: API
 spec:
   type: openapi
   lifecycle: production
   owner: guests
   definition:
-    $text: https://storage.googleapis.com/paven-common-public-assets/openapi/FOLDER_NAME/openapi.yaml
+    $text: https://storage.googleapis.com/paven-common-public-assets/openapi/persistence-utils/openapi.yaml
