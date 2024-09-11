@@ -2,32 +2,19 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: persistence-utils-service
+  name: paven-persistence-utils
   annotations:
     backstage.io/techdocs-ref: dir:.
     google.com/cloudbuild-project-slug: paven-common-v3
     google.com/cloudbuild-location: us-west2
-    #sonarqube.org/project-key: Round-Feather_paven-core-vehicles-service_AYZNUzTFmcNYwvVWpkVz
+    sonarqube.org/project-key: Round-Feather_paven-persistence-utils_AZFQ_wKnmpqdTNJ_C8m9
   links:
-    - url: https://event-catalog-dev-quuvamph7q-wl.a.run.app/docs/services/CoreVehiclesService/1.0.0/
+    - url: https://event-catalog-dev.v3.paven.io/docs/
       title: EventCatalog
-    - url: https://roundfeather-paven.atlassian.net/wiki/x/AYCsNQ
-      title: Confluence
-spec:
-  type: service
-  lifecycle: production
-  owner: guests
-  providesApis:
-    - persistence-utils-api
 
----
-apiVersion: backstage.io/v1alpha1
-metadata:
-  name: persistence-utils-api
-kind: API
 spec:
-  type: openapi
+  type: library
   lifecycle: production
   owner: guests
-  definition:
-    $text: https://storage.googleapis.com/paven-common-public-assets/openapi/paven-persistence-utils/openapi.yaml
+  dependsOn:
+    - persistence-utils
