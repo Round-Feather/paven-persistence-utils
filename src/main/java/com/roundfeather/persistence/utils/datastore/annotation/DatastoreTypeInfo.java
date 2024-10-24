@@ -30,4 +30,13 @@ public @interface DatastoreTypeInfo {
      * @since 1.1
      */
     String property();
+
+    /**
+     * Sets the default subtype implementation
+     *
+     * @return the default subtype implementation
+     *
+     * @since 1.2
+     */
+    Class<?> defaultImpl() default DatastoreTypeInfo.class;
 }

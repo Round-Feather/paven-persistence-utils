@@ -308,11 +308,15 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
                         } else {
                             subTypeName = ((Value) e.getEntity(pName).getProperties().get(f.getAnnotation(DatastoreTypeInfo.class).property())).get().toString();
                         }
-                        Class subTp = Arrays.stream(f.getAnnotation(DatastoreSubTypes.class).value())
+                        Optional<Class> optionalSubTp = Arrays.stream(f.getAnnotation(DatastoreSubTypes.class).value())
                                 .filter(st -> st.name().equals(subTypeName) || Arrays.stream(st.names()).toList().contains(subTypeName))
-                                .map(st -> st.type())
-                                .findFirst()
-                                .get();
+                                .map(DatastoreSubType::type)
+                                .findFirst();
+
+                        Class subTp;
+                        subTp = optionalSubTp.orElseGet(
+                                () -> f.getAnnotation(DatastoreTypeInfo.class).defaultImpl()
+                        );
 
                         setFieldValue(o, f, em.handleProperty(dsNamespace, subTp, val));
                     }
