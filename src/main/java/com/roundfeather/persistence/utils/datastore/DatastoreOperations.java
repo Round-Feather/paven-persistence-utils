@@ -17,7 +17,7 @@ import java.util.List;
  * @since 1.0
  */
 @ApplicationScoped
-@SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
+@SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName", "squid:S3740"})
 public class DatastoreOperations {
 
 

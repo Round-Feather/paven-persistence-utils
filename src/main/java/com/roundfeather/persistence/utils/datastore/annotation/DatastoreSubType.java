@@ -8,6 +8,7 @@ import com.google.cloud.datastore.Entity;
  *
  * @since 1.1
  */
+@SuppressWarnings({"squid:S3740"})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DatastoreSubType {
     /**
