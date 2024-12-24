@@ -4,6 +4,7 @@ import static com.roundfeather.persistence.utils.ObjectUtils.getFieldValue;
 import static com.roundfeather.persistence.utils.ObjectUtils.setFieldValue;
 
 import com.google.cloud.datastore.*;
+import com.roundfeather.persistence.utils.ObjectUtils;
 import com.roundfeather.persistence.utils.datastore.annotation.*;
 import com.roundfeather.persistence.utils.datastore.serde.impl.EntitySerde;
 import com.roundfeather.persistence.utils.datastore.serde.DataStoreObjectSerde;
@@ -342,7 +343,7 @@ public class EntityManager {
     private void setAncestorFields(Object o, FullEntity e) {
         e.getKey().getAncestors().forEach(
                 pe -> {
-                    Optional<Field> af = Arrays.stream(o.getClass().getDeclaredFields())
+                    Optional<Field> af = ObjectUtils.getAllFields(o.getClass()).stream()
                             .filter(f -> f.getAnnotation(DatastoreAncestor.class) != null && f.getAnnotation(DatastoreAncestor.class).kind().equals(pe.getKind()))
                             .findFirst();
 
@@ -366,7 +367,7 @@ public class EntityManager {
      * @since 1.0
      */
     private void setKeyField(Object o, FullEntity e) {
-        Optional<Field> kf = Arrays.stream(o.getClass().getDeclaredFields())
+        Optional<Field> kf = ObjectUtils.getAllFields(o.getClass()).stream()
                 .filter(f -> f.getAnnotation(DatastoreKey.class) != null)
                 .findFirst();
 

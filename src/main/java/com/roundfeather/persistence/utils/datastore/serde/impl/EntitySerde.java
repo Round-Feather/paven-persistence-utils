@@ -69,6 +69,7 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
     }
 
     @Override
+    @SuppressWarnings({"squid:S3776"})
     public Value serialize(EntityManager em, Object o, boolean excludeFromIndex, IncompleteKey key) {
         log.debug(String.format("Serializing '%s' to a value of type 'ENTITY'", o.getClass().getName()));
 
@@ -88,7 +89,18 @@ public class EntitySerde implements DataStoreObjectSerde<Object> {
                     } else {
                         log.debug(String.format(FOUND_FIELD, f.getType().getName(), f.getName()));
                     }
-                    Value v = em.createProperty(o, f);
+                    Value v;
+                    if (f.getAnnotation(DatastoreWithSerde.class) != null) {
+                        try {
+                            CustomSerde<Object> customSerde = f.getAnnotation(DatastoreWithSerde.class).value().getDeclaredConstructor().newInstance();
+                            v = customSerde.serialize(em, getFieldValue(o, f), f.getAnnotation(DatastoreExcludeFromIndex.class) != null);
+                        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                                 NoSuchMethodException e) {
+                            throw new PavenSerdeException(String.format("Failed serializing [%s] for [%s]", f.getName(), o.getClass().getName()), e);
+                        }
+                    } else {
+                        v = em.createProperty(o, f);
+                    }
 
                     if (v != null) {
                         if (f.getAnnotation(DatastoreNested.class) != null) {
