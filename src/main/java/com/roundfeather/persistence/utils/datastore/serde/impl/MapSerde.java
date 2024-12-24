@@ -21,7 +21,7 @@ import java.util.Map;
  * @since 1.0
  */
 @ApplicationScoped
-@SuppressWarnings({"PMD.CyclomaticComplexity"})
+@SuppressWarnings({"PMD.CyclomaticComplexity", "squid:S3740"})
 @Slf4j
 public class MapSerde implements DataStoreObjectSerde<Map> {
 

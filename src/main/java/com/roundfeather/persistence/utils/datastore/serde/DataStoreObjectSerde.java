@@ -12,8 +12,9 @@ import java.lang.reflect.Type;
  *
  * @param <T> Type of Object to being serialized/deserialized
  *
- * @since 1.0.0
+ * @since 1.0
  */
+@SuppressWarnings({"squid:S3740"})
 public interface DataStoreObjectSerde<T>{
 
     /**

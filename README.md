@@ -85,7 +85,7 @@ public class MyObject {
     // derived from the parent object
     @DatastoreExternalEntity(ancestorFactory = MyAncestorFactory.class)
     private List<MyExternalObject> externalObjects;
-    
+
     // Datastore properties can be nested in a child object instead as well
     @DatastoreNested
     private SomeNestedObject nestedObject;
@@ -98,6 +98,22 @@ public class MyObject {
 
     // Embedded objects are also supported
     private MyOtherObject otherObject;
+
+    // Instantiate subtype of a class based on a property value
+    @DatastoreTypeInfo(
+            include = InclusionType.INTERNAL_PROPERTY,
+            property = "type",
+            defaultImpl = MyDefaultSubType.class
+    )
+    @DatastoreSubTypes({
+            @DatastoreSubType(type = MySubType1.class, name = "type1"),
+            @DatastoreSubType(type = MySubType2.class, name = "type2")
+    })
+    private MyAbstractObject abstractObject;
+
+    // You can specify a custom serde class to handle a specific field
+    @DatastoreWithSerde(MyCustomSerde.class)
+    private String someCustomField;
 }
 ```
 

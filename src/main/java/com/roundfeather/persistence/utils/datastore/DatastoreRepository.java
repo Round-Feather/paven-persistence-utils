@@ -34,6 +34,7 @@ import com.roundfeather.persistence.utils.datastore.annotation.DatastoreKey;
  *
  * @since 1.0
  */
+@SuppressWarnings({"squid:S3740"})
 public interface DatastoreRepository<E> {
 
     /**
@@ -70,7 +71,7 @@ public interface DatastoreRepository<E> {
      */
     default List<E> list(DatastoreNamespace dsNamespace, List<Ancestor> ancestors) {
         Class tp = (Class) ((ParameterizedType) this.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
-        return (List<E>) DatastoreOperations.getInstance().list(dsNamespace, tp, ancestors);
+        return DatastoreOperations.getInstance().list(dsNamespace, tp, ancestors);
     }
 
     /**
@@ -268,7 +269,7 @@ public interface DatastoreRepository<E> {
      */
     default List<E> eval(Query query) {
         Class tp = (Class) ((ParameterizedType) this.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
-        return (List<E>) DatastoreOperations.getInstance().eval(query, tp);
+        return DatastoreOperations.getInstance().eval(query, tp);
     }
 
     /**

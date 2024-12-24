@@ -1,6 +1,8 @@
 package com.roundfeather.persistence.utils;
 
 import com.roundfeather.persistence.utils.datastore.annotation.DatastoreKey;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -14,7 +16,8 @@ import static com.roundfeather.persistence.utils.ObjectUtils.setFieldValue;
  *
  * @since 1.0
  */
-@SuppressWarnings("PMD.CyclomaticComplexity")
+@SuppressWarnings({"PMD.CyclomaticComplexity", "squid:S3740"})
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CompareUtils {
 
     private static final List<Class> PRIMITIVE_CLASSES = List.of(
@@ -45,7 +48,7 @@ public class CompareUtils {
             return true;
         } else if (a != null && b == null) {
             return false;
-        } else if (a == null && b != null) {
+        } else if (a == null) {
             return false;
         }
 
@@ -115,8 +118,8 @@ public class CompareUtils {
             return a.equals(b);
         }
 
-        if (a instanceof List) {
-            return handleLists((List) a, (List) b, ignoreKeyFields);
+        if (a instanceof List l) {
+            return handleLists(l, (List) b, ignoreKeyFields);
         }
 
 

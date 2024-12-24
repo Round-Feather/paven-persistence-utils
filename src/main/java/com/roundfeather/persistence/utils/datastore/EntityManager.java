@@ -24,7 +24,7 @@ import java.util.*;
  */
 @Startup
 @ApplicationScoped
-@SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName", "PMD.CyclomaticComplexity"})
+@SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName", "PMD.CyclomaticComplexity", "squid:S3740"})
 public class EntityManager {
 
     @Inject
@@ -404,6 +404,7 @@ public class EntityManager {
      *
      * @since 1.0
      */
+    @SuppressWarnings("squid:S3655")
     public Object getExternalEntity(DatastoreNamespace dsNamespace, Object o, Field f) {
         if (f.getType() == List.class) {
             Class tp = (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
